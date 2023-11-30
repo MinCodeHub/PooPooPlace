@@ -1,3 +1,11 @@
 <resources>
+
     <string name="app_name">PooPooPlace</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Example of changing placeholder text -->
+    <string name="updated_hello_text">Updated hello text</string>
+
+    <!-- Example of adding a new string -->
+    <string name="new_string">This is a new string</string>
 </resources>
