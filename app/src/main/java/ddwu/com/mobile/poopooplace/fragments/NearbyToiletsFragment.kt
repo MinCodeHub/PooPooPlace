@@ -6,16 +6,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import ddwu.com.mobile.poopooplace.R
+import ddwu.com.mobile.poopooplace.databinding.FragmentMyReviewsBinding
+import ddwu.com.mobile.poopooplace.databinding.FragmentNearbyToiletsBinding
 
 
 class NearbyToiletsFragment : Fragment() {
 
+    private var mBinding: FragmentNearbyToiletsBinding? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_nearby_toilets, container, false)
+        val binging = FragmentNearbyToiletsBinding.inflate(inflater,container,false)
+        mBinding = binging
+        return mBinding?.root
+    }
+
+    override fun onDestroy() {
+        mBinding = null
+        super.onDestroy()
     }
 
 

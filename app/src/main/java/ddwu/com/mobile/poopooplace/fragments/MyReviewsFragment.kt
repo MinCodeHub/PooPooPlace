@@ -6,15 +6,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import ddwu.com.mobile.poopooplace.R
+import ddwu.com.mobile.poopooplace.databinding.FragmentMyReviewsBinding
 
 
 class MyReviewsFragment : Fragment() {
+    private var mBinding: FragmentMyReviewsBinding? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_my_reviews, container, false)
+        val binging = FragmentMyReviewsBinding.inflate(inflater,container,false)
+        mBinding = binging
+        return mBinding?.root
+    }
+
+    override fun onDestroy() {
+        mBinding = null
+        super.onDestroy()
     }
 
 }

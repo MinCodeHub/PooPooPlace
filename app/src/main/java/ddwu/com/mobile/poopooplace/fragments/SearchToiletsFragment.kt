@@ -6,15 +6,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import ddwu.com.mobile.poopooplace.R
+import ddwu.com.mobile.poopooplace.databinding.FragmentNearbyToiletsBinding
+import ddwu.com.mobile.poopooplace.databinding.FragmentSearchToiletsBinding
 
 class SearchToiletsFragment : Fragment() {
+
+    private var mBinding: FragmentSearchToiletsBinding? = null
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search_toilets, container, false)
+        val binging = FragmentSearchToiletsBinding.inflate(inflater,container,false)
+        mBinding = binging
+        return mBinding?.root
+    }
+
+    override fun onDestroy() {
+        mBinding = null
+        super.onDestroy()
     }
 
 }

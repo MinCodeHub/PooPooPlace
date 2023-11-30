@@ -2,19 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/near"
+        android:id="@+id/nearbyToiletsFragment"
         android:enabled="true"
         android:icon="@drawable/mytoilet"
         android:title="화장실"
         app:showAsAction="always"/>
     <item
-        android:id="@+id/search"
+        android:id="@+id/searchToiletsFragment"
         android:enabled="true"
         android:icon="@drawable/otherrigiontoilets"
         android:title="검색 지역 화장실"
         app:showAsAction="always"/>
     <item
-        android:id="@+id/review"
+        android:id="@+id/myReviewsFragment"
         android:enabled="true"
         android:icon="@drawable/myreview"
         android:title="내 리뷰"
