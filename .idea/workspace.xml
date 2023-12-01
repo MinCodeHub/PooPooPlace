@@ -9,21 +9,15 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0e4415f7-c077-4655-a80f-cc4c10431c4c" name="Changes" comment="[add] 네비게이션 바 이미지 커밋">
-      <change afterPath="$PROJECT_DIR$/app/src/main/res/navigation/nav_graph.xml" afterDir="false" />
+    <list default="true" id="0e4415f7-c077-4655-a80f-cc4c10431c4c" name="Changes" comment="[add] 네비게이션 바 구현 완료">
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/ddwu/com/mobile/poopooplace/data/Restroom.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.0/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.0/executionHistory/executionHistory.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/8.0/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.0/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/ddwu/com/mobile/poopooplace/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/ddwu/com/mobile/poopooplace/MainActivity.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/ddwu/com/mobile/poopooplace/fragments/MyReviewsFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/ddwu/com/mobile/poopooplace/fragments/MyReviewsFragment.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/ddwu/com/mobile/poopooplace/fragments/NearbyToiletsFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/ddwu/com/mobile/poopooplace/fragments/NearbyToiletsFragment.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/ddwu/com/mobile/poopooplace/fragments/SearchToiletsFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/ddwu/com/mobile/poopooplace/fragments/SearchToiletsFragment.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/baseline_breakfast_dining_24.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/baseline_brightness_low_24.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/drawable/baseline_my_location_24.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_main.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_my_reviews.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_my_reviews.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_nearby_toilets.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_nearby_toilets.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/fragment_search_toilets.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/fragment_search_toilets.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/menu/bottom_navigation_menu.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/menu/bottom_navigation_menu.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,10 +73,10 @@
       <list>
         <option value="layoutResourceFile" />
         <option value="Class" />
-        <option value="Kotlin Class" />
         <option value="layoutResourceFile_vertical" />
         <option value="resourceFile" />
         <option value="navigationResourceFile" />
+        <option value="Kotlin Class" />
       </list>
     </option>
   </component>
@@ -111,7 +105,7 @@
     "RunOnceActivity.cidr.known.project.marker": "true",
     "android-custom-viewC:/Users/minyoung1030/.gradle/caches/modules-2/files-2.1/com.google.android.material/material/1.4.0-beta01/4609f0eac57d146f2f30d34a6288a469235a32ca/material-1.4.0-beta01-sources.jar!/com/google/android/material/bottomnavigation/BottomNavigationView.java_SELECTED": "BottomNavigationView",
     "cidr.known.project.marker": "true",
-    "last_opened_file_path": "D:/MobileApplication/PooPooPlace",
+    "last_opened_file_path": "D:/MobileApplication/Week07/NaverRetrofitTest",
     "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.17",
     "project.structure.side.proportion": "0.0",
@@ -229,7 +223,14 @@
       <option name="project" value="LOCAL" />
       <updated>1701356574889</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="[add] 네비게이션 바 구현 완료">
+      <created>1701360966099</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1701360966099</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -247,6 +248,7 @@
     <MESSAGE value="First commit" />
     <MESSAGE value="[add] 하단 네비게이션 바 배치" />
     <MESSAGE value="[add] 네비게이션 바 이미지 커밋" />
-    <option name="LAST_COMMIT_MESSAGE" value="[add] 네비게이션 바 이미지 커밋" />
+    <MESSAGE value="[add] 네비게이션 바 구현 완료" />
+    <option name="LAST_COMMIT_MESSAGE" value="[add] 네비게이션 바 구현 완료" />
   </component>
 </project>
