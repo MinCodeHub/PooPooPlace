@@ -1,66 +1,62 @@
 package ddwu.com.mobile.poopooplace.data
-annotation class JsonProperty(val value: String)
-annotation class SerializedName(val value: String)
+import com.google.gson.annotations.SerializedName
 
-//    최상위 시작 부분을 나타내는 클래스
-data class Root(
-        @JsonProperty("SearchPublicToiletPOIService")
-        val searchPublicToiletPoiservice: SearchPublicToiletPoiservice,
-    )
+data class RestroomRoot(
+    @SerializedName("searchPublicToiletPoiservice")
+    val searchPublicToiletPoiservice: SearchPublicToiletPoiservice
+)
 
 
 data class SearchPublicToiletPoiservice(
-        @JsonProperty("list_total_count")
-        val listTotalCount: ListTotalCount,
-        @JsonProperty("RESULT")
-        val result: Result,
-        @SerializedName("row")
-        val restrooms : List<Restroom>,
-    )
-
+    @SerializedName("listTotalCount")
+    val listTotalCount: ListTotalCount,
+    @SerializedName("result")
+    val result: Result,
+    @SerializedName("restrooms")
+    val restrooms: List<Restroom>
+)
 
 data class ListTotalCount(
-        @JsonProperty("_text")
-        val text: String,
-    )
+    @SerializedName("_text")
+    val text: String
+)
 
-    data class Result(
-        @JsonProperty("CODE")
-        val code: Code,
-        @JsonProperty("MESSAGE")
-        val message: Message,
-    )
+data class Result(
+    @SerializedName("CODE")
+    val code: Code,
+    @SerializedName("MESSAGE")
+    val message: Message
+)
 
-    data class Code(
-        @JsonProperty("_text")
-        val text: String,
-    )
+data class Code(
+    @SerializedName("_text")
+    val text: String
+)
 
-    data class Message(
-        @JsonProperty("_text")
-        val text: String,
-    )
+data class Message(
+    @SerializedName("_text")
+    val text: String
+)
 
-    data class Restroom(
-        @JsonProperty("POI_ID")
-        val poiId: String,
-        @JsonProperty("FNAME")
-        val fname: String,
-        @JsonProperty("ANAME")
-        val aname: String,
-        @JsonProperty("CNAME")
-        val cname: Map<String, Any>,
-        @JsonProperty("CENTER_X1")
-        val centerX1: String,
-        @JsonProperty("CENTER_Y1")
-        val centerY1: String,
-        @JsonProperty("X_WGS84")
-        val xWgs84: String,
-        @JsonProperty("Y_WGS84")
-        val yWgs84: String,
-        @JsonProperty("INSERTDATE")
-        val insertdate: String,
-        @JsonProperty("UPDATEDATE")
-        val updatedate: String,
-    )
-
+data class Restroom(
+    @SerializedName("POI_ID")
+    val poiId: String,
+    @SerializedName("FNAME")
+    val fname: String,
+    @SerializedName("ANAME")
+    val aname: String,
+    @SerializedName("CNAME")
+    val cname: Map<String, Any>,
+    @SerializedName("CENTER_X1")
+    val centerX1: String,
+    @SerializedName("CENTER_Y1")
+    val centerY1: String,
+    @SerializedName("X_WGS84")
+    val xWgs84: String,
+    @SerializedName("Y_WGS84")
+    val yWgs84: String,
+    @SerializedName("INSERTDATE")
+    val insertdate: String,
+    @SerializedName("UPDATEDATE")
+    val updatedate: String
+)
