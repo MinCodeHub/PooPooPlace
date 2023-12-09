@@ -2,40 +2,14 @@ package ddwu.com.mobile.poopooplace.data
 import com.google.gson.annotations.SerializedName
 
 data class RestroomRoot(
-    @SerializedName("searchPublicToiletPoiservice")
+    @SerializedName("SearchPublicToiletPOIService")
     val searchPublicToiletPoiservice: SearchPublicToiletPoiservice
 )
 
 
 data class SearchPublicToiletPoiservice(
-    @SerializedName("listTotalCount")
-    val listTotalCount: ListTotalCount,
-    @SerializedName("result")
-    val result: Result,
-    @SerializedName("restrooms")
+    @SerializedName("row")
     val restrooms: List<Restroom>
-)
-
-data class ListTotalCount(
-    @SerializedName("_text")
-    val text: String
-)
-
-data class Result(
-    @SerializedName("CODE")
-    val code: Code,
-    @SerializedName("MESSAGE")
-    val message: Message
-)
-
-data class Code(
-    @SerializedName("_text")
-    val text: String
-)
-
-data class Message(
-    @SerializedName("_text")
-    val text: String
 )
 
 data class Restroom(
@@ -46,7 +20,7 @@ data class Restroom(
     @SerializedName("ANAME")
     val aname: String,
     @SerializedName("CNAME")
-    val cname: Map<String, Any>,
+    val cname: String,
     @SerializedName("CENTER_X1")
     val centerX1: String,
     @SerializedName("CENTER_Y1")

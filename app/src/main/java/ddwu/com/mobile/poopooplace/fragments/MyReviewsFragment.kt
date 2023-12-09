@@ -21,7 +21,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 class MyReviewsFragment : Fragment() {
     private var mBinding: FragmentMyReviewsBinding? = null
     private val TAG = "MyReviewsFragment"
-    lateinit var adapter : RestroomAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,39 +36,5 @@ class MyReviewsFragment : Fragment() {
         super.onDestroy()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
-        adapter = RestroomAdapter() // Initialize your adapter
-
-        val retrofit = Retrofit.Builder()
-            .baseUrl(resources.getString(R.string.restroom_url)) // Replace with your actual base URL
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        val service = retrofit.create(PublicToiletPOIServiceeAPIService::class.java)
-
-        // Change the method name to match your actual API service interface
-        mBinding?.btnSearch?.setOnClickListener {
-            val apiCallback = object : Callback<RestroomRoot> {
-                override fun onResponse(call: Call<RestroomRoot>, response: Response<RestroomRoot>) {
-                    if (response.isSuccessful) {
-                        val root: RestroomRoot? = response.body()
-                        adapter.restrooms = root?.searchPublicToiletPoiservice?.restrooms
-                        adapter.notifyDataSetChanged()
-                    } else {
-                        Log.d(TAG, "Unsuccessful Response")
-                    }
-                }
-
-                override fun onFailure(call: Call<RestroomRoot>, t: Throwable) {
-                    Log.d(TAG, "OpenAPI Call Failure ${t.message}")
-                }
-            }
-
-            // Change the method call to match your actual API service interface
-            val apiCall: Call<RestroomRoot> = service.getToiletData(resources.getString(R.string.restroom_key))
-            apiCall.enqueue(apiCallback)
-        }
-    }
 }

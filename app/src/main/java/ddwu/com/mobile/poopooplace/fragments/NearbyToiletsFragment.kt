@@ -6,9 +6,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import ddwu.com.mobile.poopooplace.R
 import ddwu.com.mobile.poopooplace.data.RestroomRoot
-import ddwu.com.mobile.poopooplace.databinding.FragmentMyReviewsBinding
 import ddwu.com.mobile.poopooplace.databinding.FragmentNearbyToiletsBinding
 import ddwu.com.mobile.poopooplace.network.PublicToiletPOIServiceeAPIService
 import ddwu.com.mobile.poopooplace.ui.RestroomAdapter
@@ -18,40 +18,32 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-
 class NearbyToiletsFragment : Fragment() {
 
-    private var mBinding: FragmentNearbyToiletsBinding? = null
-    private val TAG ="NEARBYTOLIETS"
-    lateinit var adapter : RestroomAdapter
+    private lateinit var mBinding: FragmentNearbyToiletsBinding
+    private val TAG = "NEARBYTOLIETS"
+    private lateinit var adapter: RestroomAdapter
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binging = FragmentNearbyToiletsBinding.inflate(inflater,container,false)
-        mBinding = binging
-        return mBinding?.root
-    }
-
-    override fun onDestroy() {
-        mBinding = null
-        super.onDestroy()
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        adapter = RestroomAdapter() // Initialize your adapter
+        adapter = RestroomAdapter()
+        val binding = FragmentNearbyToiletsBinding.inflate(inflater, container, false)
+        mBinding = binding
+        mBinding.rvRestRoom.adapter = adapter
+        mBinding.rvRestRoom.layoutManager = LinearLayoutManager(requireContext())
 
         val retrofit = Retrofit.Builder()
-            .baseUrl(resources.getString(R.string.restroom_url)) // Replace with your actual base URL
+            .baseUrl(resources.getString(R.string.restroom_url))
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
         val service = retrofit.create(PublicToiletPOIServiceeAPIService::class.java)
 
-        // Change the method name to match your actual API service interface
-        mBinding?.btnSearch?.setOnClickListener {
+        mBinding.btnSearch.setOnClickListener {
+            val targetKeyword = mBinding.tvItem.text.toString()
+
             val apiCallback = object : Callback<RestroomRoot> {
                 override fun onResponse(
                     call: Call<RestroomRoot>,
@@ -59,10 +51,15 @@ class NearbyToiletsFragment : Fragment() {
                 ) {
                     if (response.isSuccessful) {
                         val root: RestroomRoot? = response.body()
+                        Log.d(TAG, "Response: $root")
                         adapter.restrooms = root?.searchPublicToiletPoiservice?.restrooms
                         adapter.notifyDataSetChanged()
+                        Log.d(TAG, "Successful Response")
+                        Log.d(TAG, "Response: ${adapter.restrooms}")
+                        Log.d(TAG, "Raw Response: ${response.raw().toString()}")
+
                     } else {
-                        Log.d(TAG, "Unsuccessful Response")
+                        Log.d(TAG, "Unsuccessful Response: ${response.errorBody()}")
                     }
                 }
 
@@ -71,10 +68,22 @@ class NearbyToiletsFragment : Fragment() {
                 }
             }
 
-            // Change the method call to match your actual API service interface
+
             val apiCall: Call<RestroomRoot> =
-                service.getToiletData(resources.getString(R.string.restroom_key))
+                service.getToiletData(resources.getString(R.string.restroom_key), targetKeyword)
+            Log.d(TAG, "API URL: ${apiCall.request().url()}")
+
             apiCall.enqueue(apiCallback)
         }
+
+        return mBinding.root
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
     }
 }

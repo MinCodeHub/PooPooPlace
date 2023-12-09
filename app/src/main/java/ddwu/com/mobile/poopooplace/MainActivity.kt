@@ -5,6 +5,9 @@ import android.os.Bundle
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import ddwu.com.mobile.poopooplace.databinding.ActivityMainBinding
+import ddwu.com.mobile.poopooplace.network.PublicToiletPOIServiceeAPIService
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 
 class MainActivity : AppCompatActivity(){
@@ -24,12 +27,6 @@ class MainActivity : AppCompatActivity(){
         //바텀 네비게인션 뷰와 네비게이션을 묶어준다.
         NavigationUI.setupWithNavController(mBinding.bottomNavi,navController)
 
-//        val retrofit = Retrofit.Builder()
-//            .baseUrl(resources.getString(R.string.restroom_url))
-//            .addConverterFactory( GsonConverterFactory.create() )
-//            .build()
-//
-//        val service = retrofit.create(PublicToiletPOIServiceeAPIService::class.java)
 
     }
 }
