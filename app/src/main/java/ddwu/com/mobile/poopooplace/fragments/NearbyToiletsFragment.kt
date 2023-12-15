@@ -1,5 +1,6 @@
 package ddwu.com.mobile.poopooplace.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -7,10 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
+import ddwu.com.mobile.poopooplace.MapActivity
 import ddwu.com.mobile.poopooplace.R
+import ddwu.com.mobile.poopooplace.data.Restroom
 import ddwu.com.mobile.poopooplace.data.RestroomRoot
 import ddwu.com.mobile.poopooplace.databinding.FragmentNearbyToiletsBinding
 import ddwu.com.mobile.poopooplace.network.PublicToiletPOIServiceeAPIService
+import ddwu.com.mobile.poopooplace.ui.OnItemClickListener
 import ddwu.com.mobile.poopooplace.ui.RestroomAdapter
 import retrofit2.Call
 import retrofit2.Callback
@@ -75,7 +79,15 @@ class NearbyToiletsFragment : Fragment() {
 
             apiCall.enqueue(apiCallback)
         }
-
+        adapter.onItemClickListener = object : OnItemClickListener {
+            override fun onItemClick(restroom: Restroom) {
+                // 아이템 클릭 시 처리할 내용을 여기에 작성
+                // 예: Intent를 사용한 화면 전환
+                val intent = Intent(requireContext(), MapActivity::class.java)
+                //intent.putExtra("key", value) // 필요한 경우 데이터 전달
+                startActivity(intent)
+            }
+        }
         return mBinding.root
     }
 
