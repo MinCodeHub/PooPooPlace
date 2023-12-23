@@ -50,10 +50,11 @@ class MapActivity : AppCompatActivity() {
     private lateinit var geocoder: Geocoder
     private lateinit var currentLoc: Location
     private lateinit var googleMap: GoogleMap
-    var latitude: String? = null
-    var longitude: String? = null
-
-    var centerMarker: Marker? = null
+    var exact_location: String? = null   //geocode한 화장실의 구체적인 위치 정보를 담을 변수 -> 마커 snippet
+    var latitude: String? = null  //intent로 받아올 위도 값을 저장할 변수
+    var longitude: String? = null //intent로 받아올 경도 값을 저장할 변수
+    var restroomlocation: String? = null  //api에 있는 대명칭인 장소 건물 이름 intent로 받아올 값을 담을 변수 -> 마커 title
+    var centerMarker: Marker? = null //마커 변수
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +62,7 @@ class MapActivity : AppCompatActivity() {
 
         latitude = intent.getStringExtra("위도")
         longitude = intent.getStringExtra("경도")
+        restroomlocation = intent.getStringExtra("화장실")
 
         Log.d(TAG, "latitude is ${latitude}")
         Log.d(TAG, "longitude is ${longitude}")
@@ -76,6 +78,7 @@ class MapActivity : AppCompatActivity() {
 
     //map 정보 가져 오기 완료 확인 Callback
     val mapReadyCallback = object : OnMapReadyCallback {
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         override fun onMapReady(map: GoogleMap) {
             googleMap = map //map 정보 가져오기 완료 시 멤버변수에 저장
             var dlat = latitude?.toDouble()
@@ -85,23 +88,33 @@ class MapActivity : AppCompatActivity() {
                 //위도 경도 위치 설정
                 val targetLocation = LatLng(dlat, dlogi)
 
-                //카메라 움직이기
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(targetLocation, 17F))
-                Log.d(TAG, "GoogleMap is ready")
-                Log.d(TAG, "Actual latitude: $dlat, Actual longitude: $dlogi")
-                addMarker(targetLocation)
+                //지오코딩
+                geocoder.getFromLocation(dlat, dlogi, 5) { addresses ->
+                    CoroutineScope(Dispatchers.Main).launch {
+                        exact_location = addresses.get(0).getAddressLine(0).toString()
+                        showData(addresses.get(0).getAddressLine(0).toString())
 
+                        //카메라 움직이기
+                        googleMap.animateCamera(
+                            CameraUpdateFactory.newLatLngZoom(
+                                targetLocation,
+                                17F
+                            )
+                        )
+                        addMarker(targetLocation, addresses.get(0).getAddressLine(0).toString())
+                    }
+                }
             }
         }
     }
 
-    fun addMarker(targetLoc: LatLng) {
+    fun addMarker(targetLoc: LatLng, exactLocation: String?) {
+        Log.d(TAG, "exact_location : ${exactLocation}")
         val markerOptions: MarkerOptions = MarkerOptions() // 마커를 표현하는 Option 생성
         markerOptions.position(targetLoc) // 필수
-            .title("화장실")
-            .snippet("마커 말풍선")
+            .title(restroomlocation)
+            .snippet(exactLocation ?: "Location information not available")
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-        // .icon(BitmapDescriptorFactory.fromResource(R.mipmap.android))
         centerMarker = googleMap.addMarker(markerOptions) // 지도에 마커 추가, 추가마커 반환
         centerMarker?.showInfoWindow() // 마커 터치 시 InfoWindow 표시
         centerMarker?.tag = "database_id" // 마커에 관련 정보(Object) 저장
@@ -119,5 +132,7 @@ class MapActivity : AppCompatActivity() {
         }
     }
 
-
+    private fun showData(data: String) {
+        mapBinding.tvData.setText(mapBinding.tvData.text.toString() + "\n${data}")
+    }
 }
