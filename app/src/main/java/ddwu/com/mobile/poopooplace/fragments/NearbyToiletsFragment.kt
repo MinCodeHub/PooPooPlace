@@ -87,6 +87,7 @@ class NearbyToiletsFragment : Fragment() {
                 val intent = Intent(requireContext(), MapActivity::class.java)
                 intent.putExtra("위도", restroom.yWgs84) // 위도 전달
                 intent.putExtra("경도", restroom.xWgs84) // 경도 전달
+                intent.putExtra("화장실", restroom.fname) // 화장실이 있는 건물 이름 전달
                 startActivity(intent)
             }
         }
