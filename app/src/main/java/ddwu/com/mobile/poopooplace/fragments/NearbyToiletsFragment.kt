@@ -83,8 +83,10 @@ class NearbyToiletsFragment : Fragment() {
             override fun onItemClick(restroom: Restroom) {
                 // 아이템 클릭 시 처리할 내용을 여기에 작성
                 // 예: Intent를 사용한 화면 전환
+                Log.d(TAG, "restroom의 centerX1:  ${restroom.centerX1}")
                 val intent = Intent(requireContext(), MapActivity::class.java)
-                //intent.putExtra("key", value) // 필요한 경우 데이터 전달
+                intent.putExtra("위도", restroom.yWgs84) // 위도 전달
+                intent.putExtra("경도", restroom.xWgs84) // 경도 전달
                 startActivity(intent)
             }
         }
