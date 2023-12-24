@@ -301,22 +301,21 @@ class NearbyToiletsFragment : Fragment() {
             Toast.makeText(requireContext(), marker.title, Toast.LENGTH_SHORT).show()
         }
     }
+
     private fun showData(data: String) {
         mBinding?.tvData?.let {
             it.setText(it.text.toString() + "\n$data")
         }
     }
 
+
     //현재위치에서 가장 가까운 화장실 찾아주기(findNearestToilet 함수 호출)
     private fun handleToiletsData(toilets: List<Restroom>?) {
         val currentLocation = LatLng(latitude ?: 0.0, longitude ?: 0.0)
         val nearestToilet = findNearestToilet(currentLocation, toilets)
-
-        if (nearestToilet != null) {
-            addMarkerForNearestToilet(nearestToilet)
-        } else {
-            return;
-        }
+        latitude = nearestToilet?.yWgs84?.toDouble()
+        longitude = nearestToilet?.xWgs84?.toDouble()
+        handleCloselyLocationDataReady()
     }
 
     //현재 위치와 가장 가까운 화장실 찾아주기
@@ -368,11 +367,28 @@ class NearbyToiletsFragment : Fragment() {
         return R * c
     }
 
-    private fun addMarkerForNearestToilet(nearestToilet: Restroom?) {
-        if (nearestToilet != null) {
-            val restroom = nearestToilet
-            val toiletLocation = LatLng(restroom.yWgs84.toDouble(), restroom.xWgs84.toDouble())
-            addMarker(toiletLocation, "Nearest Toilet")
+    //마커찍기
+    private fun addMarkerForNearestToilet(targetLoc: LatLng, exactLocation: String?) {
+        Log.d(TAG, "exact_location : ${exactLocation}")
+        val markerOptions: MarkerOptions = MarkerOptions() // 마커를 표현하는 Option 생성
+        markerOptions.position(targetLoc) // 필수
+            .title("가장 가까운 공중 화장실 위치")
+            .snippet(exactLocation ?: "Location information not available")
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+        centerMarker = googleMap.addMarker(markerOptions) // 지도에 마커 추가, 추가마커 반환
+        centerMarker?.showInfoWindow() // 마커 터치 시 InfoWindow 표시
+        // 마커에 관련 정보(Object) 저장
+
+
+        // 마커 클릭 이벤트 처리
+        googleMap.setOnMarkerClickListener { marker ->
+            Toast.makeText(requireContext(), marker.tag.toString(), Toast.LENGTH_SHORT).show()
+            false // true일 경우 이벤트처리 종료이므로 info window 미출력
+        }
+
+        // 마커 InfoWindow 클릭 이벤트 처리
+        googleMap.setOnInfoWindowClickListener { marker ->
+            Toast.makeText(requireContext(), marker.title, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -416,6 +432,51 @@ class NearbyToiletsFragment : Fragment() {
         apiCall.enqueue(apiCallback)
     }
 
+    //가까운 위치의 화장실 callback
+    private fun handleCloselyLocationDataReady() {
+        if (!isLocationDataReady) {
+            return
+        }
+
+        val mapFragment: SupportMapFragment =
+            childFragmentManager.findFragmentById(R.id.nearbyToiletsmap) as SupportMapFragment
+        mapFragment.getMapAsync(mapReadyCloselyCallback)
+    }
+
+    val mapReadyCloselyCallback = object : OnMapReadyCallback {
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        override fun onMapReady(map: GoogleMap) {
+            //Log.d(TAG, "위도: ${latitude}, 경도: ${longitude}")
+            googleMap = map //map 정보 가져오기 완료 시 멤버변수에 저장
+            var dlat = latitude
+            var dlogi = longitude
+
+            if (dlat != null && dlogi != null) {
+                //위도 경도 위치 설정
+                val targetLocation = LatLng(dlat, dlogi)
+
+                //지오코딩
+                geocoder.getFromLocation(dlat, dlogi, 5) { addresses ->
+                    CoroutineScope(Dispatchers.Main).launch {
+                        exact_location = addresses.get(0).getAddressLine(0).toString()
+                        showData(addresses.get(0).getAddressLine(0).toString())
+                        //카메라 움직이기
+                        googleMap.animateCamera(
+                            CameraUpdateFactory.newLatLngZoom(
+                                targetLocation,
+                                17F
+                            )
+                        )
+                        addMarkerForNearestToilet(
+                            targetLocation,
+                            addresses.get(0).getAddressLine(0).toString()
+                        )
+                    }
+                }
+            }
+            showData("위도: ${latitude}, 경도: ${longitude}")
+        }
+    }
 
 }
 
