@@ -8,7 +8,7 @@ import retrofit2.http.Query
 
 // 요청정보
 interface PublicToiletPOIServiceeAPIService {
-    @GET("{key}/json/SearchPublicToiletPOIService/1/20")
+    @GET("{key}/json/SearchPublicToiletPOIService/1/400")
     fun getToiletData(
         @Path("key") key: String,
         @Query("ANAME") ANAME :String,

@@ -55,6 +55,7 @@ class MapActivity : AppCompatActivity() {
     var longitude: String? = null //intent로 받아올 경도 값을 저장할 변수
     var restroomlocation: String? = null  //api에 있는 대명칭인 장소 건물 이름 intent로 받아올 값을 담을 변수 -> 마커 title
     var centerMarker: Marker? = null //마커 변수
+    var restroomtype:String? = null  //민간 화장실인지 개방 화장실인지
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,12 +64,12 @@ class MapActivity : AppCompatActivity() {
         latitude = intent.getStringExtra("위도")
         longitude = intent.getStringExtra("경도")
         restroomlocation = intent.getStringExtra("화장실")
-
+        restroomtype = intent.getStringExtra("화장실 타입")
+        
         Log.d(TAG, "latitude is ${latitude}")
         Log.d(TAG, "longitude is ${longitude}")
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         geocoder = Geocoder(this, Locale.getDefault())
-
 
         val mapFragment: SupportMapFragment =
             supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -92,8 +93,8 @@ class MapActivity : AppCompatActivity() {
                 geocoder.getFromLocation(dlat, dlogi, 5) { addresses ->
                     CoroutineScope(Dispatchers.Main).launch {
                         exact_location = addresses.get(0).getAddressLine(0).toString()
+                        showData(restroomtype.toString())
                         showData(addresses.get(0).getAddressLine(0).toString())
-
                         //카메라 움직이기
                         googleMap.animateCamera(
                             CameraUpdateFactory.newLatLngZoom(
@@ -117,7 +118,8 @@ class MapActivity : AppCompatActivity() {
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
         centerMarker = googleMap.addMarker(markerOptions) // 지도에 마커 추가, 추가마커 반환
         centerMarker?.showInfoWindow() // 마커 터치 시 InfoWindow 표시
-        centerMarker?.tag = "database_id" // 마커에 관련 정보(Object) 저장
+//        centerMarker?.tag = "database_id"
+        // 마커에 관련 정보(Object) 저장
 
 
         // 마커 클릭 이벤트 처리
