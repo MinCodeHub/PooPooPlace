@@ -1,11 +1,9 @@
 package ddwu.com.mobile.poopooplace.fragments
 
 import android.Manifest
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
@@ -34,11 +32,18 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import ddwu.com.mobile.poopooplace.R
+import ddwu.com.mobile.poopooplace.data.Restroom
+import ddwu.com.mobile.poopooplace.data.RestroomRoot
 import ddwu.com.mobile.poopooplace.databinding.FragmentNearbyToiletsBinding
-import ddwu.com.mobile.poopooplace.databinding.FragmentSearchToiletsBinding
+import ddwu.com.mobile.poopooplace.network.PublicToiletPOIServiceeAPIService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception
 import java.util.Locale
 
@@ -69,7 +74,13 @@ class NearbyToiletsFragment : Fragment() {
         mBinding = binging
 
         mBinding?.btnPermit?.setOnClickListener {
-            checkPermissions()
+            if (isLocationDataReady) {
+                fetchToiletData()
+
+            } else {
+                Toast.makeText(requireContext(), "Location data is not ready", Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
 
         mBinding?.btnLastLoc?.setOnClickListener {
@@ -80,11 +91,12 @@ class NearbyToiletsFragment : Fragment() {
 
 
         mBinding?.btnLocStart?.setOnClickListener {
+            checkPermissions()
             startLocUpdates()
         }
 
         mBinding?.btnLocStop?.setOnClickListener {
-
+            onPause()
         }
 
         mBinding?.btnLocTitle?.setOnClickListener {
@@ -196,6 +208,7 @@ class NearbyToiletsFragment : Fragment() {
         )
         isLocationDataReady = false //위치 데이터 준비 안됨
 
+
     }
 
 
@@ -220,23 +233,6 @@ class NearbyToiletsFragment : Fragment() {
         }
     }
 
-
-    //    fun callExternalMap() {
-//        val locLatLng   // 위도/경도 정보로 지도 요청 시
-//                = String.format("geo:%f,%f?z=%d", 37.606320, 127.041808, 17)
-//        val locName     // 위치명으로 지도 요청 시
-//                = "https://www.google.co.kr/maps/place/" + "Hawolgok-dong"
-//        val route       // 출발-도착 정보 요청 시
-//                = String.format(
-//            "https://www.google.co.kr/maps?saddr=%f,%f&daddr=%f,%f",
-//            37.606320, 127.041808, 37.601925, 127.041530
-//        )
-//        //위도 경도 결합 우리나라에서는 잘 안됨
-//        //필요시 네이버 맵 또는 카카오맵 활용
-//        val uri = Uri.parse(locLatLng)
-//        val intent = Intent(Intent.ACTION_VIEW, uri)
-//        startActivity(intent)
-//    }
     private fun handleLocationDataReady() {
         if (!isLocationDataReady) {
             return
@@ -305,11 +301,121 @@ class NearbyToiletsFragment : Fragment() {
             Toast.makeText(requireContext(), marker.title, Toast.LENGTH_SHORT).show()
         }
     }
-
     private fun showData(data: String) {
         mBinding?.tvData?.let {
             it.setText(it.text.toString() + "\n$data")
         }
     }
 
+    //현재위치에서 가장 가까운 화장실 찾아주기(findNearestToilet 함수 호출)
+    private fun handleToiletsData(toilets: List<Restroom>?) {
+        val currentLocation = LatLng(latitude ?: 0.0, longitude ?: 0.0)
+        val nearestToilet = findNearestToilet(currentLocation, toilets)
+
+        if (nearestToilet != null) {
+            addMarkerForNearestToilet(nearestToilet)
+        } else {
+            return;
+        }
+    }
+
+    //현재 위치와 가장 가까운 화장실 찾아주기
+    private fun findNearestToilet(
+        currentLocation: LatLng,
+        toilets: List<Restroom>?
+    ): Restroom? {
+        var nearestToilet: Restroom? = null
+        var minDistance = Double.MAX_VALUE
+
+        if (toilets != null) {
+            for (restroom in toilets) {
+                val restroomlit = restroom.yWgs84.toDouble()
+                val restroomlog = restroom.xWgs84.toDouble()
+                val toiletLocation = LatLng(restroomlit, restroomlog)
+                showData("toiletLocation: ${toiletLocation.latitude}, 경도: ${toiletLocation.longitude}")
+                Log.d("toiletLocation", toiletLocation.toString())
+                val distance = calculateDistance(currentLocation, toiletLocation)
+
+                if (distance < minDistance) {
+                    minDistance = distance
+                    nearestToilet = restroom
+                }
+            }
+        }
+        Log.d("nearestToilet", nearestToilet.toString())
+        showData("nearestToilet: ${nearestToilet.toString()}")
+        return nearestToilet
+    }
+
+
+    //현재 위치와의 거리 계산하기
+    private fun calculateDistance(location1: LatLng, location2: LatLng): Double {
+        val R = 6371 // Earth radius in kilometers
+        val lat1 = Math.toRadians(location1.latitude)
+        val lon1 = Math.toRadians(location1.longitude)
+        val lat2 = Math.toRadians(location2.latitude)
+        val lon2 = Math.toRadians(location2.longitude)
+
+        val dLon = lon2 - lon1
+        val dLat = lat2 - lat1
+
+        val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1) * Math.cos(lat2) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2)
+
+        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+        return R * c
+    }
+
+    private fun addMarkerForNearestToilet(nearestToilet: Restroom?) {
+        if (nearestToilet != null) {
+            val restroom = nearestToilet
+            val toiletLocation = LatLng(restroom.yWgs84.toDouble(), restroom.xWgs84.toDouble())
+            addMarker(toiletLocation, "Nearest Toilet")
+        }
+    }
+
+
+    //오픈 API연결 및 현재위치에서 가장 가까운 화장실 찾아줄 함수(handleToiletsData)호출
+    private fun fetchToiletData() {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(resources.getString(R.string.restroom_url))
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        val service = retrofit.create(PublicToiletPOIServiceeAPIService::class.java)
+
+        val apiCallback = object : Callback<RestroomRoot> {
+            override fun onResponse(
+                call: Call<RestroomRoot>,
+                response: Response<RestroomRoot>
+            ) {
+                if (response.isSuccessful) {
+                    val root: RestroomRoot? = response.body()
+                    Log.d(TAG, "Response: $root")
+                    var restrooms = root?.searchPublicToiletPoiservice?.restrooms
+                    Log.d(TAG, "Successful Response")
+                    Log.d(TAG, "Response: ${restrooms}")
+                    handleToiletsData(restrooms)
+                } else {
+                    Log.d(TAG, "Unsuccessful Response: ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<RestroomRoot>, t: Throwable) {
+                Log.d(TAG, "OpenAPI Call Failure ${t.message}")
+            }
+        }
+
+
+        val apiCall: Call<RestroomRoot> =
+            service.getToiletData(resources.getString(R.string.restroom_key), "민간")
+        Log.d(TAG, "API URL: ${apiCall.request().url()}")
+
+        apiCall.enqueue(apiCallback)
+    }
+
+
 }
+

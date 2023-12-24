@@ -2,6 +2,7 @@ package ddwu.com.mobile.poopooplace.network
 
 import ddwu.com.mobile.poopooplace.data.RestroomRoot
 import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -13,4 +14,5 @@ interface PublicToiletPOIServiceeAPIService {
         @Path("key") key: String,
         @Query("ANAME") ANAME :String,
     ): Call<RestroomRoot> // 결과 반환 타입
+
 }
