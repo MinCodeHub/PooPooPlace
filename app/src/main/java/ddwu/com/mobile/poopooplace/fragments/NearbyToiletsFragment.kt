@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
@@ -24,6 +25,15 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import ddwu.com.mobile.poopooplace.R
 import ddwu.com.mobile.poopooplace.databinding.FragmentNearbyToiletsBinding
 import ddwu.com.mobile.poopooplace.databinding.FragmentSearchToiletsBinding
 import kotlinx.coroutines.CoroutineScope
@@ -39,7 +49,14 @@ class NearbyToiletsFragment : Fragment() {
     private var mBinding: FragmentNearbyToiletsBinding? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var geocoder: Geocoder
+    private lateinit var googleMap: GoogleMap
+    var exact_location: String? = null   //geocode한 화장실의 구체적인 위치 정보를 담을 변수 -> 마커 snippet
+    var latitude: Double? = null  //intent로 받아올 위도 값을 저장할 변수
+    var longitude: Double? = null //intent로 받아올 경도 값을 저장할 변수
+    var centerMarker: Marker? = null //마커 변수
 //    private lateinit var currentLoc: Location
+
+    private var isLocationDataReady = false //위치 데이터가 준비되었는지 추적하는 플래그
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
@@ -57,6 +74,7 @@ class NearbyToiletsFragment : Fragment() {
 
         mBinding?.btnLastLoc?.setOnClickListener {
             getLastLocation()
+
             // callExternalMap()
         }
 
@@ -73,6 +91,9 @@ class NearbyToiletsFragment : Fragment() {
             getLastLocation()
             //callExternalMap()
         }
+
+
+
         return mBinding?.root
     }
 
@@ -130,7 +151,9 @@ class NearbyToiletsFragment : Fragment() {
     val locCallback: LocationCallback = object : LocationCallback() {
         override fun onLocationResult(locResult: LocationResult) {
             val currentLoc: Location = locResult.locations[0]
-//            showData("위도: ${currentLoc.latitude}, 경도: ${currentLoc.longitude}")
+            //showData("위도: ${currentLoc.latitude}, 경도: ${currentLoc.longitude}")
+            latitude = currentLoc.latitude  //변수에 위도 경도 저장
+            longitude = currentLoc.longitude
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 geocoder.getFromLocation(
                     currentLoc.latitude,
@@ -138,7 +161,10 @@ class NearbyToiletsFragment : Fragment() {
                     1
                 ) { addresses ->
                     CoroutineScope(Dispatchers.Main).launch {
-                        showData(addresses.get(0).toString())
+                        showData(addresses.get(0).getAddressLine(0).toString())
+                        isLocationDataReady = true  //위치 데이터 준비 완료
+                        handleLocationDataReady()  //handleLocationDataReady() 실행
+
                     }
 
                 }
@@ -168,6 +194,8 @@ class NearbyToiletsFragment : Fragment() {
             locCallback,
             Looper.getMainLooper()
         )
+        isLocationDataReady = false //위치 데이터 준비 안됨
+
     }
 
 
@@ -193,7 +221,7 @@ class NearbyToiletsFragment : Fragment() {
     }
 
 
-//    fun callExternalMap() {
+    //    fun callExternalMap() {
 //        val locLatLng   // 위도/경도 정보로 지도 요청 시
 //                = String.format("geo:%f,%f?z=%d", 37.606320, 127.041808, 17)
 //        val locName     // 위치명으로 지도 요청 시
@@ -209,7 +237,74 @@ class NearbyToiletsFragment : Fragment() {
 //        val intent = Intent(Intent.ACTION_VIEW, uri)
 //        startActivity(intent)
 //    }
+    private fun handleLocationDataReady() {
+        if (!isLocationDataReady) {
+            return
+        }
 
+        val mapFragment: SupportMapFragment =
+            childFragmentManager.findFragmentById(R.id.nearbyToiletsmap) as SupportMapFragment
+        mapFragment.getMapAsync(mapReadyCallback)
+    }
+
+
+    //map 정보 가져 오기 완료 확인 Callback
+    val mapReadyCallback = object : OnMapReadyCallback {
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        override fun onMapReady(map: GoogleMap) {
+            //Log.d(TAG, "위도: ${latitude}, 경도: ${longitude}")
+            googleMap = map //map 정보 가져오기 완료 시 멤버변수에 저장
+            var dlat = latitude
+            var dlogi = longitude
+
+            if (dlat != null && dlogi != null) {
+                //위도 경도 위치 설정
+                val targetLocation = LatLng(dlat, dlogi)
+
+                //지오코딩
+                geocoder.getFromLocation(dlat, dlogi, 5) { addresses ->
+                    CoroutineScope(Dispatchers.Main).launch {
+                        exact_location = addresses.get(0).getAddressLine(0).toString()
+                        showData(addresses.get(0).getAddressLine(0).toString())
+                        //카메라 움직이기
+                        googleMap.animateCamera(
+                            CameraUpdateFactory.newLatLngZoom(
+                                targetLocation,
+                                17F
+                            )
+                        )
+                        addMarker(targetLocation, addresses.get(0).getAddressLine(0).toString())
+                    }
+                }
+            }
+            showData("위도: ${latitude}, 경도: ${longitude}")
+        }
+    }
+
+    fun addMarker(targetLoc: LatLng, exactLocation: String?) {
+        Log.d(TAG, "exact_location : ${exactLocation}")
+        val markerOptions: MarkerOptions = MarkerOptions() // 마커를 표현하는 Option 생성
+        markerOptions.position(targetLoc) // 필수
+            .title("현재 위치")
+            .snippet(exactLocation ?: "Location information not available")
+            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+        centerMarker = googleMap.addMarker(markerOptions) // 지도에 마커 추가, 추가마커 반환
+        centerMarker?.showInfoWindow() // 마커 터치 시 InfoWindow 표시
+//        centerMarker?.tag = "database_id"
+        // 마커에 관련 정보(Object) 저장
+
+
+        // 마커 클릭 이벤트 처리
+        googleMap.setOnMarkerClickListener { marker ->
+            Toast.makeText(requireContext(), marker.tag.toString(), Toast.LENGTH_SHORT).show()
+            false // true일 경우 이벤트처리 종료이므로 info window 미출력
+        }
+
+        // 마커 InfoWindow 클릭 이벤트 처리
+        googleMap.setOnInfoWindowClickListener { marker ->
+            Toast.makeText(requireContext(), marker.title, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     private fun showData(data: String) {
         mBinding?.tvData?.let {
