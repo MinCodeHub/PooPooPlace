@@ -2,6 +2,7 @@ package ddwu.com.mobile.poopooplace.fragments
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Geocoder
 import android.location.Location
 import android.os.Build
@@ -31,6 +32,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.StyleSpan
 import ddwu.com.mobile.poopooplace.R
 import ddwu.com.mobile.poopooplace.data.Restroom
 import ddwu.com.mobile.poopooplace.data.RestroomRoot
@@ -59,7 +62,8 @@ class NearbyToiletsFragment : Fragment() {
     var latitude: Double? = null  //intent로 받아올 위도 값을 저장할 변수
     var longitude: Double? = null //intent로 받아올 경도 값을 저장할 변수
     var centerMarker: Marker? = null //마커 변수
-//    private lateinit var currentLoc: Location
+    var currentLit: Double? = null
+    var currentLon: Double? = null
 
     private var isLocationDataReady = false //위치 데이터가 준비되었는지 추적하는 플래그
 
@@ -166,6 +170,8 @@ class NearbyToiletsFragment : Fragment() {
             //showData("위도: ${currentLoc.latitude}, 경도: ${currentLoc.longitude}")
             latitude = currentLoc.latitude  //변수에 위도 경도 저장
             longitude = currentLoc.longitude
+            currentLit = latitude
+            currentLon = longitude
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 geocoder.getFromLocation(
                     currentLoc.latitude,
@@ -369,6 +375,7 @@ class NearbyToiletsFragment : Fragment() {
 
     //마커찍기
     private fun addMarkerForNearestToilet(targetLoc: LatLng, exactLocation: String?) {
+        drawLine()
         Log.d(TAG, "exact_location : ${exactLocation}")
         val markerOptions: MarkerOptions = MarkerOptions() // 마커를 표현하는 Option 생성
         markerOptions.position(targetLoc) // 필수
@@ -476,6 +483,20 @@ class NearbyToiletsFragment : Fragment() {
             }
             showData("위도: ${latitude}, 경도: ${longitude}")
         }
+    }
+
+    fun drawLine() {
+        // Line 을 표시하는 옵션 생성
+        val polylineOptions = PolylineOptions()
+            // 선 색상 지정, 여러 번 지정 가능
+            .addSpan(StyleSpan(Color.RED))
+            // LatLng 로 선 지점 추가
+            .add(currentLit?.let { currentLon?.let { it1 -> LatLng(it, it1) } })
+            .add(latitude?.let { longitude?.let { it1 -> LatLng(it, it1) } })
+
+// 지도에 line 추가, 추가된 line 반환
+        val line = googleMap.addPolyline(polylineOptions)
+// line.remove() 로 선 삭제
     }
 
 }
