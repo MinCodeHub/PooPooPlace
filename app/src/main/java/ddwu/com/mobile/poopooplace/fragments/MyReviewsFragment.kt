@@ -67,6 +67,20 @@ class MyReviewsFragment : Fragment() {
                 startActivity(intent)
             }
         })
+
+        //롱클릭 시 삭제
+        adapter.setOnItemLongClickListener(object : MemoAdapter.OnMemoItemLongClickListener {
+            override fun onItemLongClick(position: Int) {
+                val selectedMemo = adapter.memoList?.get(position)
+                selectedMemo?.let {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        withContext(Dispatchers.IO) {
+                            memoDao.deleteMemo(it)
+                        }
+                    }
+                }
+            }
+        })
         showAllMemo()
 
         return mBinding?.root

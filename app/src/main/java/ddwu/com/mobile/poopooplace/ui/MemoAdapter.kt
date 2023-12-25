@@ -10,6 +10,7 @@ class MemoAdapter: RecyclerView.Adapter<MemoAdapter.MemoHolder>(){
 
     var memoList: List<MemoDto>? = null
     var itemClickListener: OnMemoItemClickListener? = null
+    var itemLongClickListener: OnMemoItemLongClickListener? = null
 
     override fun getItemCount(): Int {
         return memoList?.size ?: 0
@@ -28,14 +29,31 @@ class MemoAdapter: RecyclerView.Adapter<MemoAdapter.MemoHolder>(){
         }
     }
 
-    class MemoHolder(val itemBinding: ReviewItemBinding) : RecyclerView.ViewHolder(itemBinding.root)
-
+    inner class MemoHolder(val itemBinding: ReviewItemBinding) : RecyclerView.ViewHolder(itemBinding.root) {
+        init {
+            // Set up long-click listener here
+            itemBinding.root.setOnLongClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    itemLongClickListener?.onItemLongClick(position)
+                }
+                true
+            }
+        }
+    }
     interface OnMemoItemClickListener {
         fun onItemClick(position: Int)
-    }
 
+    }
+    interface OnMemoItemLongClickListener{
+        fun onItemLongClick(position: Int)
+    }
     fun setOnItemClickListener(listener: OnMemoItemClickListener) {
         itemClickListener = listener
+    }
+
+    fun setOnItemLongClickListener(listener: OnMemoItemLongClickListener) {
+        itemLongClickListener = listener
     }
 
 
