@@ -93,7 +93,7 @@ class MapActivity : AppCompatActivity() {
                 geocoder.getFromLocation(dlat, dlogi, 5) { addresses ->
                     CoroutineScope(Dispatchers.Main).launch {
                         exact_location = addresses.get(0).getAddressLine(0).toString()
-                        showData(restroomtype.toString())
+                        //showData(restroomtype.toString())
                         showData(addresses.get(0).getAddressLine(0).toString())
                         //카메라 움직이기
                         googleMap.animateCamera(
