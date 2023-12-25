@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MemoDao {
-
     @Query("SELECT * FROM memo_table")
     fun getAllMemos() : Flow<List<MemoDto>>
 

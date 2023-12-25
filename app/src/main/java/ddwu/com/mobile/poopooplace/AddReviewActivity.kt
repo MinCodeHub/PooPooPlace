@@ -54,10 +54,15 @@ class AddReviewActivity : AppCompatActivity() {
         memoDB.memoDao()
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(addMemoBinding.root)
 
+        val loc = intent.getStringExtra("화장실위치")
+//        val ex_loc = intent.getStringExtra("화장실상세위치")
+        addMemoBinding.tvAddMemo.setText(loc)
+//        addMemoBinding.tvAddMemo.setText(ex_loc)
         addMemoBinding.btnAdd.setOnClickListener {
             if (currentPhotoFileName != null) {
                 val memo = addMemoBinding.tvAddMemo.text.toString()

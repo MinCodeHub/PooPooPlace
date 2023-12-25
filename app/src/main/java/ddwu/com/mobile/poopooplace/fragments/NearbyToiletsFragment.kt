@@ -406,7 +406,6 @@ class NearbyToiletsFragment : Fragment() {
             .baseUrl(resources.getString(R.string.restroom_url))
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-
         val service = retrofit.create(PublicToiletPOIServiceeAPIService::class.java)
 
         val apiCallback = object : Callback<RestroomRoot> {
@@ -425,12 +424,10 @@ class NearbyToiletsFragment : Fragment() {
                     Log.d(TAG, "Unsuccessful Response: ${response.errorBody()}")
                 }
             }
-
             override fun onFailure(call: Call<RestroomRoot>, t: Throwable) {
                 Log.d(TAG, "OpenAPI Call Failure ${t.message}")
             }
         }
-
 
         val apiCall: Call<RestroomRoot> =
             service.getToiletData(resources.getString(R.string.restroom_key), "민간")

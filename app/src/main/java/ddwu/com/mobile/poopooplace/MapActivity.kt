@@ -75,6 +75,14 @@ class MapActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(mapReadyCallback)
 
+
+        mapBinding.addreview.setOnClickListener {
+            val intent = Intent(this, AddReviewActivity::class.java)
+            intent.putExtra("화장실위치", restroomlocation)
+//            intent.putExtra("화장실상세위치", exact_location)
+            startActivity(intent)
+        }
+
     }
 
     //map 정보 가져 오기 완료 확인 Callback
