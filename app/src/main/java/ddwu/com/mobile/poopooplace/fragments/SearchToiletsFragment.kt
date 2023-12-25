@@ -56,11 +56,14 @@ class SearchToiletsFragment : Fragment() {
                     if (response.isSuccessful) {
                         val root: RestroomRoot? = response.body()
                         Log.d(TAG, "Response: $root")
-                        adapter.restrooms = root?.searchPublicToiletPoiservice?.restrooms
+                        val filteredRestrooms = root?.searchPublicToiletPoiservice?.restrooms
+                            ?.filter { it.fname.contains(targetKeyword, ignoreCase = true) }
+
+                        adapter.restrooms = filteredRestrooms
                         adapter.notifyDataSetChanged()
                         Log.d(TAG, "Successful Response")
-                        Log.d(TAG, "Response: ${adapter.restrooms}")
                         Log.d(TAG, "Raw Response: ${response.raw().toString()}")
+                        Log.d(TAG, "Filtered Restrooms: $filteredRestrooms")
 
                     } else {
                         Log.d(TAG, "Unsuccessful Response: ${response.errorBody()}")

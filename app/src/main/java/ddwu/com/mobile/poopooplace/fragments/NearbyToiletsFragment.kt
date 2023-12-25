@@ -347,7 +347,7 @@ class NearbyToiletsFragment : Fragment() {
                 }
             }
         }
-        Log.d("nearestToilet", nearestToilet.toString())
+        //Log.d("nearestToilet", nearestToilet.toString())
         showData("nearestToilet: ${nearestToilet.toString()}")
         return nearestToilet
     }
