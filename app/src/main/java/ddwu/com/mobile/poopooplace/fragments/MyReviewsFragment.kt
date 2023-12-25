@@ -81,8 +81,7 @@ class MyReviewsFragment : Fragment() {
                 }
             }
         })
-        showAllMemo()
-
+        onResume()
         return mBinding?.root
     }
 
@@ -98,6 +97,10 @@ class MyReviewsFragment : Fragment() {
     override fun onDestroy() {
         mBinding = null
         super.onDestroy()
+    }
+    override fun onResume() {
+        super.onResume()
+        showAllMemo()
     }
 
 
